@@ -30,6 +30,7 @@ produces::
      :literal:
 
 """
+from __future__ import absolute_import
 import os
 try:
     from docutils import nodes, utils

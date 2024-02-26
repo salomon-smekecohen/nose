@@ -2,6 +2,7 @@
 classes when writing tests; they are used internally by nose.loader.TestLoader
 to create test cases from test functions and methods in test classes.
 """
+from __future__ import absolute_import
 import logging
 import sys
 import unittest

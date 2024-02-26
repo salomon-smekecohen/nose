@@ -3,15 +3,17 @@ import unittest
 from nose.config import Config
 from nose.plugins import debug
 from optparse import OptionParser
-from StringIO import StringIO
+from io import StringIO
+
 
 class StubPdb:
     called = False
+
     def post_mortem(self, tb):
         self.called = True
 
-class TestPdbPlugin(unittest.TestCase):
 
+class TestPdbPlugin(unittest.TestCase):
     def setUp(self):
         self._pdb = debug.pdb
         self._so = sys.stdout
@@ -35,7 +37,7 @@ class TestPdbPlugin(unittest.TestCase):
             raise Exception("oops")
         except:
             err = sys.exc_info()
-    
+
         p.enabled = True
         p.enabled_for_errors = True
         p.enabled_for_failures = True
@@ -52,9 +54,9 @@ class TestPdbPlugin(unittest.TestCase):
 
         p = debug.Pdb()
         p.addOptions(parser)
-        options, args = parser.parse_args(['test_configuration',
-                                           '--pdb',
-                                           '--pdb-failures'])
+        options, args = parser.parse_args(
+            ["test_configuration", "--pdb", "--pdb-failures"]
+        )
         p.configure(options, Config())
         assert p.enabled
         assert p.enabled_for_errors
@@ -67,35 +69,34 @@ class TestPdbPlugin(unittest.TestCase):
 
         parser = OptionParser()
         p.addOptions(parser)
-        options, args = parser.parse_args(['test_configuration'])
+        options, args = parser.parse_args(["test_configuration"])
         p.configure(options, Config())
         assert not p.enabled
         assert not p.enabled_for_errors
         assert not p.enabled_for_failures
-        
+
     def test_env_settings_enable(self):
         p = debug.Pdb()
         assert not p.enabled
         assert not p.enabled_for_failures
 
-        env = {'NOSE_PDB': '1',
-               'NOSE_PDB_FAILURES': '1'}
+        env = {"NOSE_PDB": "1", "NOSE_PDB_FAILURES": "1"}
 
         parser = OptionParser()
         p.addOptions(parser, env)
-        options, args = parser.parse_args(['test_configuration'])
+        options, args = parser.parse_args(["test_configuration"])
         p.configure(options, Config())
         assert p.enabled
         assert p.enabled_for_errors
         assert p.enabled_for_failures
 
     def test_real_stdout_restored_before_call(self):
-        
         class CheckStdout(StubPdb):
             def post_mortem(self, tb):
-                assert sys.stdout is sys.__stdout__, \
-                       "sys.stdout was not restored to sys.__stdout__ " \
-                       "before call"
+                assert sys.stdout is sys.__stdout__, (
+                    "sys.stdout was not restored to sys.__stdout__ " "before call"
+                )
+
         debug.pdb = CheckStdout()
 
         patch = StringIO()
@@ -108,10 +109,10 @@ class TestPdbPlugin(unittest.TestCase):
             raise Exception("oops")
         except:
             err = sys.exc_info()
-    
-        p.addError(None, err)    
+
+        p.addError(None, err)
         assert sys.stdout is patch, "sys.stdout was not reset after call"
-        
-        
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     unittest.main()

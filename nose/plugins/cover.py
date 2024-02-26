@@ -10,6 +10,7 @@ variable.
 
 .. _coverage: http://www.nedbatchelder.com/code/modules/coverage.html
 """
+from __future__ import absolute_import
 import logging
 import re
 import sys
@@ -161,7 +162,7 @@ class Coverage(Plugin):
             self.coverInstance.exclude('#pragma[: ]+[nN][oO] [cC][oO][vV][eE][rR]')
 
             log.debug("Coverage begin")
-            self.skipModules = sys.modules.keys()[:]
+            self.skipModules = list(sys.modules.keys())[:]
             if self.coverErase:
                 log.debug("Clearing previously collected coverage statistics")
                 self.coverInstance.combine()
@@ -209,14 +210,14 @@ class Coverage(Plugin):
             log.debug("Generating HTML coverage report")
             try:
                 self.coverInstance.html_report(modules, self.coverHtmlDir)
-            except coverage.misc.CoverageException, e:
+            except coverage.misc.CoverageException as e:
                 log.warning("Failed to generate HTML report: %s" % str(e))
 
         if self.coverXmlFile:
             log.debug("Generating XML coverage report")
             try:
                 self.coverInstance.xml_report(modules, self.coverXmlFile)
-            except coverage.misc.CoverageException, e:
+            except coverage.misc.CoverageException as e:
                 log.warning("Failed to generate XML report: %s" % str(e))
 
         # make sure we have minimum required coverage

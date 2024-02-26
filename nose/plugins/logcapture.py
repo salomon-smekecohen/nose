@@ -15,6 +15,7 @@ You can remove other installed logging handlers with the
 ``--logging-clear-handlers`` option.
 """
 
+from __future__ import absolute_import
 import logging
 from logging import Handler
 import threading
@@ -25,9 +26,10 @@ from nose.util import anyp, ln, safe_str
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 log = logging.getLogger(__name__)
+
 
 class FilterSet(object):
     def __init__(self, filter_components):
@@ -37,11 +39,12 @@ class FilterSet(object):
     def _partition(components):
         inclusive, exclusive = [], []
         for component in components:
-            if component.startswith('-'):
+            if component.startswith("-"):
                 exclusive.append(component[1:])
             else:
                 inclusive.append(component)
         return inclusive, exclusive
+
     _partition = staticmethod(_partition)
 
     def allow(self, record):
@@ -55,9 +58,12 @@ class FilterSet(object):
     def _any_match(matchers, record):
         """return the bool of whether `record` starts with
         any item in `matchers`"""
+
         def record_matches_key(key):
-            return record == key or record.startswith(key + '.')
+            return record == key or record.startswith(key + ".")
+
         return anyp(bool, map(record_matches_key, matchers))
+
     _any_match = staticmethod(_any_match)
 
     def _allow(self, record):
@@ -78,19 +84,25 @@ class MyMemoryHandler(Handler):
         self.setFormatter(fmt)
         self.filterset = FilterSet(filters)
         self.buffer = []
+
     def emit(self, record):
         self.buffer.append(self.format(record))
+
     def flush(self):
-        pass # do nothing
+        pass  # do nothing
+
     def truncate(self):
         self.buffer = []
+
     def filter(self, record):
         if self.filterset.allow(record.name):
             return Handler.filter(self, record)
+
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['lock']
+        del state["lock"]
         return state
+
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.lock = threading.RLock()
@@ -103,64 +115,81 @@ class LogCapture(Plugin):
     appending any output captured to the error or failure output,
     should the test fail or raise an error.
     """
+
     enabled = True
-    env_opt = 'NOSE_NOLOGCAPTURE'
-    name = 'logcapture'
+    env_opt = "NOSE_NOLOGCAPTURE"
+    name = "logcapture"
     score = 500
-    logformat = '%(name)s: %(levelname)s: %(message)s'
+    logformat = "%(name)s: %(levelname)s: %(message)s"
     logdatefmt = None
     clear = False
-    filters = ['-nose']
+    filters = ["-nose"]
 
     def options(self, parser, env):
-        """Register commandline options.
-        """
+        """Register commandline options."""
         parser.add_option(
-            "--nologcapture", action="store_false",
-            default=not env.get(self.env_opt), dest="logcapture",
+            "--nologcapture",
+            action="store_false",
+            default=not env.get(self.env_opt),
+            dest="logcapture",
             help="Disable logging capture plugin. "
-                 "Logging configuration will be left intact."
-                 " [NOSE_NOLOGCAPTURE]")
+            "Logging configuration will be left intact."
+            " [NOSE_NOLOGCAPTURE]",
+        )
         parser.add_option(
-            "--logging-format", action="store", dest="logcapture_format",
-            default=env.get('NOSE_LOGFORMAT') or self.logformat,
+            "--logging-format",
+            action="store",
+            dest="logcapture_format",
+            default=env.get("NOSE_LOGFORMAT") or self.logformat,
             metavar="FORMAT",
             help="Specify custom format to print statements. "
-                 "Uses the same format as used by standard logging handlers."
-                 " [NOSE_LOGFORMAT]")
+            "Uses the same format as used by standard logging handlers."
+            " [NOSE_LOGFORMAT]",
+        )
         parser.add_option(
-            "--logging-datefmt", action="store", dest="logcapture_datefmt",
-            default=env.get('NOSE_LOGDATEFMT') or self.logdatefmt,
+            "--logging-datefmt",
+            action="store",
+            dest="logcapture_datefmt",
+            default=env.get("NOSE_LOGDATEFMT") or self.logdatefmt,
             metavar="FORMAT",
             help="Specify custom date/time format to print statements. "
-                 "Uses the same format as used by standard logging handlers."
-                 " [NOSE_LOGDATEFMT]")
+            "Uses the same format as used by standard logging handlers."
+            " [NOSE_LOGDATEFMT]",
+        )
         parser.add_option(
-            "--logging-filter", action="store", dest="logcapture_filters",
-            default=env.get('NOSE_LOGFILTER'),
+            "--logging-filter",
+            action="store",
+            dest="logcapture_filters",
+            default=env.get("NOSE_LOGFILTER"),
             metavar="FILTER",
             help="Specify which statements to filter in/out. "
-                 "By default, everything is captured. If the output is too"
-                 " verbose,\nuse this option to filter out needless output.\n"
-                 "Example: filter=foo will capture statements issued ONLY to\n"
-                 " foo or foo.what.ever.sub but not foobar or other logger.\n"
-                 "Specify multiple loggers with comma: filter=foo,bar,baz.\n"
-                 "If any logger name is prefixed with a minus, eg filter=-foo,\n"
-                 "it will be excluded rather than included. Default: "
-                 "exclude logging messages from nose itself (-nose)."
-                 " [NOSE_LOGFILTER]\n")
+            "By default, everything is captured. If the output is too"
+            " verbose,\nuse this option to filter out needless output.\n"
+            "Example: filter=foo will capture statements issued ONLY to\n"
+            " foo or foo.what.ever.sub but not foobar or other logger.\n"
+            "Specify multiple loggers with comma: filter=foo,bar,baz.\n"
+            "If any logger name is prefixed with a minus, eg filter=-foo,\n"
+            "it will be excluded rather than included. Default: "
+            "exclude logging messages from nose itself (-nose)."
+            " [NOSE_LOGFILTER]\n",
+        )
         parser.add_option(
-            "--logging-clear-handlers", action="store_true",
-            default=False, dest="logcapture_clear",
-            help="Clear all other logging handlers")
+            "--logging-clear-handlers",
+            action="store_true",
+            default=False,
+            dest="logcapture_clear",
+            help="Clear all other logging handlers",
+        )
         parser.add_option(
-            "--logging-level", action="store",
-            default='NOTSET', dest="logcapture_level",
-            help="Set the log level to capture")
+            "--logging-level",
+            action="store",
+            default="NOTSET",
+            dest="logcapture_level",
+            help="Set the log level to capture",
+        )
 
     def configure(self, options, conf):
-        """Configure plugin.
-        """
+        """Configure plugin."""
         self.conf = conf
         # Disable if explicitly disabled, or if logging is
         # configured via logging config file
@@ -171,7 +200,7 @@ class LogCapture(Plugin):
         self.clear = options.logcapture_clear
         self.loglevel = options.logcapture_level
         if options.logcapture_filters:
-            self.filters = options.logcapture_filters.split(',')
+            self.filters = options.logcapture_filters.split(",")
 
     def setupLoghandler(self):
         # setup our handler with root logger
@@ -196,7 +225,7 @@ class LogCapture(Plugin):
         root_logger.addHandler(self.handler)
         # Also patch any non-propagating loggers in the tree
         for logger in logging.Logger.manager.loggerDict.values():
-            if not getattr(logger, 'propagate', True) and hasattr(logger, "addHandler"):
+            if not getattr(logger, "propagate", True) and hasattr(logger, "addHandler"):
                 for handler in logger.handlers[:]:
                     if isinstance(handler, MyMemoryHandler):
                         logger.handlers.remove(handler)
@@ -206,36 +235,30 @@ class LogCapture(Plugin):
         root_logger.setLevel(getattr(logging, loglevel))
 
     def begin(self):
-        """Set up logging handler before test run begins.
-        """
+        """Set up logging handler before test run begins."""
         self.start()
 
     def start(self):
-        self.handler = MyMemoryHandler(self.logformat, self.logdatefmt,
-                                       self.filters)
+        self.handler = MyMemoryHandler(self.logformat, self.logdatefmt, self.filters)
         self.setupLoghandler()
 
     def end(self):
         pass
 
     def beforeTest(self, test):
-        """Clear buffers and handlers before test.
-        """
+        """Clear buffers and handlers before test."""
         self.setupLoghandler()
 
     def afterTest(self, test):
-        """Clear buffers after test.
-        """
+        """Clear buffers after test."""
         self.handler.truncate()
 
     def formatFailure(self, test, err):
-        """Add captured log messages to failure output.
-        """
+        """Add captured log messages to failure output."""
         return self.formatError(test, err)
 
     def formatError(self, test, err):
-        """Add captured log messages to error output.
-        """
+        """Add captured log messages to error output."""
         # logic flow copied from Capture.formatError
         test.capturedLogging = records = self.formatLogRecords()
         if not records:
@@ -247,6 +270,8 @@ class LogCapture(Plugin):
         return map(safe_str, self.handler.buffer)
 
     def addCaptureToErr(self, ev, records):
-        return '\n'.join([safe_str(ev), ln('>> begin captured logging <<')] + \
-                          records + \
-                          [ln('>> end captured logging <<')])
+        return "\n".join(
+            [safe_str(ev), ln(">> begin captured logging <<")]
+            + records
+            + [ln(">> end captured logging <<")]
+        )

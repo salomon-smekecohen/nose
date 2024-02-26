@@ -4,6 +4,7 @@ option will drop the test runner into pdb when it encounters an error. To
 drop into pdb on failure, use ``--pdb-failures``.
 """
 
+from __future__ import absolute_import
 import pdb
 from nose.plugins.base import Plugin
 

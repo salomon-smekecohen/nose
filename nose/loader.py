@@ -8,6 +8,7 @@ interpretations of what may be a test and how a test may be named.
 """
 from __future__ import generators
 
+from __future__ import absolute_import
 import logging
 import os
 import sys

@@ -10,6 +10,7 @@ run individual tests by index number.
 This plugin is also useful for counting tests in a test suite, and making
 people watching your demo think all of your tests pass.
 """
+from __future__ import absolute_import
 from nose.plugins.base import Plugin
 from nose.case import Test
 import logging

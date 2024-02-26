@@ -92,6 +92,7 @@ Second::
   containing the record of failed tests from your previous run.
   
 """
+from __future__ import absolute_import
 __test__ = False
 
 import logging
@@ -100,7 +101,7 @@ from nose.plugins import Plugin
 from nose.util import src, set
 
 try:
-    from cPickle import dump, load
+    from six.moves.cPickle import dump, load
 except ImportError:
     from pickle import dump, load
 
@@ -198,7 +199,7 @@ class TestId(Plugin):
                     'Loaded test ids %s tests %s failed %s sources %s from %s',
                     self.ids, self.tests, self.failed, self.source_names,
                     self.idfile)
-            except ValueError, e:
+            except ValueError as e:
                 # load() may throw a ValueError when reading the ids file, if it
                 # was generated with a newer version of Python than we are currently
                 # running.

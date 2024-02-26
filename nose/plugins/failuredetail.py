@@ -6,6 +6,7 @@ substitution is also performed in the context output to provide more
 debugging information.
 """
     
+from __future__ import absolute_import
 from nose.plugins import Plugin
 from nose.pyversion import exc_to_unicode, force_unicode
 from nose.inspector import inspect_traceback

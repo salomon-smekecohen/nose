@@ -100,6 +100,7 @@ Examples using the ``-A`` and ``--eval-attr`` options:
   Evaluates a complex Python expression and runs the test if True
 
 """
+from __future__ import absolute_import
 import inspect
 import logging
 import os
@@ -107,6 +108,7 @@ import sys
 from inspect import isfunction
 from nose.plugins.base import Plugin
 from nose.util import tolist
+import six
 
 log = logging.getLogger('nose.plugins.attrib')
 compat_24 = sys.version_info >= (2, 4)
@@ -118,7 +120,7 @@ def attr(*args, **kwargs):
     def wrap_ob(ob):
         for name in args:
             setattr(ob, name, True)
-        for name, value in kwargs.iteritems():
+        for name, value in six.iteritems(kwargs):
             setattr(ob, name, value)
         return ob
     return wrap_ob

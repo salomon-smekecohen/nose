@@ -8,7 +8,7 @@ import unittest
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
 from nose.inspector import inspect_traceback, Expander, tbsource
 

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 import textwrap
 from optparse import OptionConflictError
@@ -67,7 +68,7 @@ class Plugin(object):
         try:
             self.options(parser, env)
             self.can_configure = True
-        except OptionConflictError, e:
+        except OptionConflictError as e:
             warn("Plugin %s has conflicting option string: %s and will "
                  "be disabled" % (self, e), RuntimeWarning)
             self.enabled = False

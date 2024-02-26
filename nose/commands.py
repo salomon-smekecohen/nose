@@ -59,6 +59,7 @@ This will direct setuptools to download and activate nose during the setup
 process, making the ``nosetests`` command available.
 
 """
+from __future__ import absolute_import
 try:
     from setuptools import Command
 except ImportError:

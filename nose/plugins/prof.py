@@ -10,6 +10,7 @@ more details on the various output options.
 .. _hotshot documentation: http://docs.python.org/library/hotshot.html
 """
 
+from __future__ import absolute_import
 try:
     import hotshot
     from hotshot import stats

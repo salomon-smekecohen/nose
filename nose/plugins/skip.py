@@ -6,6 +6,7 @@ the exception will not be counted as an error or failure. This plugin
 is enabled by default but may be disabled with the ``--no-skip`` option.
 """
 
+from __future__ import absolute_import
 from nose.plugins.errorclass import ErrorClass, ErrorClassPlugin
 
 

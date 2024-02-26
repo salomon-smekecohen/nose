@@ -17,6 +17,7 @@ More information: :doc:`../doc_tests/test_allmodules/test_allmodules`
 
 """
 
+from __future__ import absolute_import
 import os
 from nose.plugins.base import Plugin
 

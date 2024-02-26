@@ -93,6 +93,7 @@ New Features in 1.1.0
 
 """
 
+from __future__ import absolute_import
 import logging
 import os
 import sys
@@ -115,7 +116,7 @@ try:
     from unittest.runner import _WritelnDecorator
 except ImportError:
     from unittest import _WritelnDecorator
-from Queue import Empty
+from six.moves.queue import Empty
 from warnings import warn
 try:
     from cStringIO import StringIO
@@ -478,7 +479,7 @@ class MultiProcessTestRunner(TextTestRunner):
                                 self.config.multiprocess_timeout-timeprocessing)
             log.debug("Completed %s tasks (%s remain)", len(completed), len(tasks))
 
-        except (KeyboardInterrupt, SystemExit), e:
+        except (KeyboardInterrupt, SystemExit) as e:
             log.info('parent received ctrl-c when waiting for test results')
             thrownError = e
             #resultQueue.get(False)
@@ -715,7 +716,7 @@ def __runner(ix, testQueue, resultQueue, currentaddr, currentstart,
             test(result)
             currentaddr.value = bytes_('')
             resultQueue.put((ix, test_addr, test.tasks, batch(result)))
-        except KeyboardInterrupt, e: #TimedOutException:
+        except KeyboardInterrupt as e: #TimedOutException:
             timeout = isinstance(e, TimedOutException)
             if timeout:
                 keyboardCaught.set()
@@ -810,7 +811,7 @@ class NoSharedFixtureContextSuite(ContextSuite):
                 #log.debug('running test %s in suite %s', test, self);
                 try:
                     test(orig)
-                except KeyboardInterrupt, e:
+                except KeyboardInterrupt as e:
                     timeout = isinstance(e, TimedOutException)
                     if timeout:
                         msg = 'Timeout when running test %s in suite %s'

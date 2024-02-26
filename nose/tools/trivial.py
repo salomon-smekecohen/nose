@@ -5,6 +5,7 @@ skip them when printing tracebacks, just as it does for their corresponding
 methods in ``unittest`` proper.
 
 """
+from __future__ import absolute_import
 import re
 import unittest
 

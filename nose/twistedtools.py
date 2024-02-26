@@ -28,9 +28,11 @@ Or, more realistically::
 .. _Twisted: http://twistedmatrix.com/trac/
 """
 
+from __future__ import absolute_import
 import sys
-from Queue import Queue, Empty
+from six.moves.queue import Queue, Empty
 from nose.tools import make_decorator, TimeExpired
+import six
 
 __all__ = [
     'threaded_reactor', 'reactor', 'deferred', 'TimeExpired',
@@ -166,7 +168,7 @@ def deferred(timeout=None):
             # Re-raise all exceptions
             if error is not None:
                 exc_type, exc_value, tb = error
-                raise exc_type, exc_value, tb
+                six.reraise(exc_type, exc_value, tb)
         wrapper = make_decorator(func)(wrapper)
         return wrapper
     return decorate

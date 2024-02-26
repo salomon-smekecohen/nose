@@ -9,6 +9,7 @@ functions or methods) for the context that contains its tests.
 """
 from __future__ import generators
 
+from __future__ import absolute_import
 import logging
 import sys
 import unittest

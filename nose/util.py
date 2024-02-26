@@ -1,5 +1,6 @@
 """Utility functions and classes used by nose internally.
 """
+from __future__ import absolute_import
 import inspect
 import itertools
 import logging
@@ -10,6 +11,7 @@ import sys
 import types
 import unittest
 from nose.pyversion import ClassType, TypeType, isgenerator, ismethod
+import six
 
 
 log = logging.getLogger('nose')
@@ -564,7 +566,7 @@ class odict(dict):
         return d
 
     def items(self):
-        return zip(self._keys, self.values())
+        return zip(self._keys, list(self.values()))
 
     def keys(self):
         return self._keys[:]
@@ -654,7 +656,7 @@ def safe_str(val, encoding='utf-8'):
         if isinstance(val, Exception):
             return ' '.join([safe_str(arg, encoding)
                              for arg in val])
-        return unicode(val).encode(encoding)
+        return six.text_type(val).encode(encoding)
 
 
 def is_executable(file):

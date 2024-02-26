@@ -6,6 +6,7 @@ will be output, and the exception will not be counted as an error or failure.
 It is enabled by default, but can be turned off by using ``--no-deprecated``.
 """
 
+from __future__ import absolute_import
 from nose.plugins.errorclass import ErrorClass, ErrorClassPlugin
 
 

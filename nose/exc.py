@@ -5,5 +5,6 @@ versions of nose where skipped and deprecated tests were core
 functionality, rather than being provided by plugins. It may be
 removed in a future release.
 """
+from __future__ import absolute_import
 from nose.plugins.skip import SkipTest
 from nose.plugins.deprecated import DeprecatedTest

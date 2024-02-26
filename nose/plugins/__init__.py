@@ -181,6 +181,7 @@ the nose source distribution. There is a list of third-party plugins
 .. _on jottit: http://nose-plugins.jottit.com/
 
 """
+from __future__ import absolute_import
 from nose.plugins.base import Plugin
 from nose.plugins.manager import *
 from nose.plugins.plugintest import PluginTester

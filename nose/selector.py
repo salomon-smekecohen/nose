@@ -6,6 +6,7 @@ Test selection is handled by a Selector. The test loader calls the
 appropriate selector method for each object it encounters that it
 thinks may be a test.
 """
+from __future__ import absolute_import
 import logging
 import os
 import unittest

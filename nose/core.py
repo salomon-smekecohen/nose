@@ -2,6 +2,8 @@
 """
 from __future__ import generators
 
+from __future__ import print_function
+from __future__ import absolute_import
 import logging
 import os
 import sys
@@ -150,7 +152,7 @@ class TestProgram(unittest.TestProgram):
         if self.config.options.version:
             from nose import __version__
             sys.stdout = sys.__stdout__
-            print "%s version %s" % (os.path.basename(sys.argv[0]), __version__)
+            print("%s version %s" % (os.path.basename(sys.argv[0]), __version__))
             sys.exit(0)
 
         if self.config.options.showPlugins:
@@ -224,26 +226,26 @@ class TestProgram(unittest.TestProgram):
         v = self.config.verbosity
         self.config.plugins.sort()
         for p in self.config.plugins:
-            print "Plugin %s" % p.name
+            print("Plugin %s" % p.name)
             if v >= 2:
-                print "  score: %s" % p.score
-                print '\n'.join(textwrap.wrap(p.help().strip(),
+                print("  score: %s" % p.score)
+                print('\n'.join(textwrap.wrap(p.help().strip(),
                                               initial_indent='  ',
-                                              subsequent_indent='  '))
+                                              subsequent_indent='  ')))
                 if v >= 3:
                     parser = DummyParser()
                     p.addOptions(parser)
                     if len(parser.options):
-                        print
-                        print "  Options:"
+                        print()
+                        print("  Options:")
                         for opts, help in parser.options:
-                            print '  %s' % (', '.join(opts))
+                            print('  %s' % (', '.join(opts)))
                             if help:
-                                print '\n'.join(
+                                print('\n'.join(
                                     textwrap.wrap(help.strip(),
                                                   initial_indent='    ',
-                                                  subsequent_indent='    '))
-                print
+                                                  subsequent_indent='    ')))
+                print()
 
     def usage(cls):
         import nose

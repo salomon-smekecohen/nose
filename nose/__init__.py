@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from nose.core import collector, main, run, run_exit, runmodule
 # backwards compatibility
 from nose.exc import SkipTest, DeprecatedTest

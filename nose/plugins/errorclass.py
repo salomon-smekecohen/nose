@@ -92,6 +92,7 @@ Since we defined a Todo as a failure, the run was not successful.
     False
 """
 
+from __future__ import absolute_import
 from nose.pyversion import make_instancemethod
 from nose.plugins.base import Plugin
 from nose.result import TextTestResult

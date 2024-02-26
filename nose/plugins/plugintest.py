@@ -95,6 +95,8 @@ arguments and reads environment variables.
 
 """
 
+from __future__ import print_function
+from __future__ import absolute_import
 import re
 import sys
 from warnings import warn
@@ -102,11 +104,13 @@ from warnings import warn
 try:
     from cStringIO import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
 
-__all__ = ['PluginTester', 'run']
+__all__ = ["PluginTester", "run"]
 
 from os import getpid
+
+
 class MultiProcessFile(object):
     """
     helper for testing multiprocessing
@@ -123,6 +127,7 @@ class MultiProcessFile(object):
     All processes can write to this object, but only the creator can read.
     This allows the testing system to see a unified picture of I/O.
     """
+
     def __init__(self):
         # per advice at:
         #    http://docs.python.org/library/multiprocessing.html#all-platforms
@@ -135,8 +140,9 @@ class MultiProcessFile(object):
         if getpid() != self.__master:
             return
 
-        from Queue import Empty
+        from six.moves.queue import Empty
         from collections import defaultdict
+
         cache = defaultdict(str)
         while True:
             try:
@@ -144,37 +150,46 @@ class MultiProcessFile(object):
             except Empty:
                 break
             if pid == ():
-                #show parent output after children
-                #this is what users see, usually
-                pid = ( 1e100, ) # googol!
+                # show parent output after children
+                # this is what users see, usually
+                pid = (1e100,)  # googol!
             cache[pid] += data
         for pid in sorted(cache):
-            #self.__buffer.write( '%s wrote: %r\n' % (pid, cache[pid]) ) #DEBUG
-            self.__buffer.write( cache[pid] )
+            # self.__buffer.write( '%s wrote: %r\n' % (pid, cache[pid]) ) #DEBUG
+            self.__buffer.write(cache[pid])
+
     def write(self, data):
         # note that these pids are in the form of current_process()._identity
         # rather than OS pids
         from multiprocessing import current_process
+
         pid = current_process()._identity
         self.__queue.put((pid, data))
+
     def __iter__(self):
         "getattr doesn't work for iter()"
         self.buffer()
         return self.__buffer
+
     def seek(self, offset, whence=0):
         self.buffer()
         return self.__buffer.seek(offset, whence)
+
     def getvalue(self):
         self.buffer()
         return self.__buffer.getvalue()
+
     def __getattr__(self, attr):
         return getattr(self.__buffer, attr)
 
+
 try:
     from multiprocessing import Manager
+
     Buffer = MultiProcessFile
 except ImportError:
     Buffer = StringIO
+
 
 class PluginTester(object):
     """A mixin for testing nose plugins in their runtime environment.
@@ -210,6 +225,7 @@ class PluginTester(object):
       - optional dict of environment variables to send nosetests
 
     """
+
     activate = None
     suitepath = None
     args = None
@@ -239,31 +255,29 @@ class PluginTester(object):
         raise NotImplementedError
 
     def _execPlugin(self):
-        """execute the plugin on the internal test suite.
-        """
+        """execute the plugin on the internal test suite."""
         from nose.config import Config
         from nose.core import TestProgram
         from nose.plugins.manager import PluginManager
 
         suite = None
         stream = Buffer()
-        conf = Config(env=self.env,
-                      stream=stream,
-                      plugins=PluginManager(plugins=self.plugins))
+        conf = Config(
+            env=self.env, stream=stream, plugins=PluginManager(plugins=self.plugins)
+        )
         if self.ignoreFiles is not None:
             conf.ignoreFiles = self.ignoreFiles
         if not self.suitepath:
             suite = self.makeSuite()
 
-        self.nose = TestProgram(argv=self.argv, config=conf, suite=suite,
-                                exit=False)
+        self.nose = TestProgram(argv=self.argv, config=conf, suite=suite, exit=False)
         self.output = AccessDecorator(stream)
 
     def setUp(self):
         """runs nosetests with the specified test suite, all plugins
         activated.
         """
-        self.argv = ['nosetests', self.activate]
+        self.argv = ["nosetests", self.activate]
         if self.args:
             self.argv.extend(self.args)
         if self.suitepath:
@@ -275,15 +289,19 @@ class PluginTester(object):
 class AccessDecorator(object):
     stream = None
     _buf = None
+
     def __init__(self, stream):
         self.stream = stream
         stream.seek(0)
         self._buf = stream.read()
         stream.seek(0)
+
     def __contains__(self, val):
         return val in self._buf
+
     def __iter__(self):
         return iter(self.stream)
+
     def __str__(self):
         return self._buf
 
@@ -294,7 +312,7 @@ def blankline_separated_blocks(text):
     for line in text.splitlines(True):
         block.append(line)
         line = line.strip()
-        if not line or line.startswith('===') and not line.strip('='):
+        if not line or line.startswith("===") and not line.strip("="):
             yield "".join(block)
             block = []
     if block:
@@ -303,7 +321,8 @@ def blankline_separated_blocks(text):
 
 def remove_stack_traces(out):
     # this regexp taken from Python 2.5's doctest
-    traceback_re = re.compile(r"""
+    traceback_re = re.compile(
+        r"""
         # Grab the traceback header.  Different versions of Python have
         # said different things on the first traceback line.
         ^(?P<hdr> Traceback\ \(
@@ -316,7 +335,9 @@ def remove_stack_traces(out):
         ^(?=\w)                 #     a line *starts* with alphanum.
         .*?(?P<exception> \w+ ) # exception name
         (?P<msg> [:\n] .*)      # the rest
-        """, re.VERBOSE | re.MULTILINE | re.DOTALL)
+        """,
+        re.VERBOSE | re.MULTILINE | re.DOTALL,
+    )
     blocks = []
     for block in blankline_separated_blocks(out):
         blocks.append(traceback_re.sub(r"\g<hdr>\n...\n\g<exception>\g<msg>", block))
@@ -324,19 +345,21 @@ def remove_stack_traces(out):
 
 
 def simplify_warnings(out):
-    warn_re = re.compile(r"""
+    warn_re = re.compile(
+        r"""
         # Cut the file and line no, up to the warning name
         ^.*:\d+:\s
         (?P<category>\w+): \s+        # warning category
         (?P<detail>.+) $ \n?          # warning message
         ^ .* $                        # stack frame
-        """, re.VERBOSE | re.MULTILINE)
+        """,
+        re.VERBOSE | re.MULTILINE,
+    )
     return warn_re.sub(r"\g<category>: \g<detail>", out)
 
 
 def remove_timings(out):
-    return re.sub(
-        r"Ran (\d+ tests?) in [0-9.]+s", r"Ran \1 in ...s", out)
+    return re.sub(r"Ran (\d+ tests?) in [0-9.]+s", r"Ran \1 in ...s", out)
 
 
 def munge_nose_output_for_doctest(out):
@@ -370,15 +393,15 @@ def run(*arg, **kw):
     from nose.plugins.manager import PluginManager
 
     buffer = Buffer()
-    if 'config' not in kw:
-        plugins = kw.pop('plugins', [])
+    if "config" not in kw:
+        plugins = kw.pop("plugins", [])
         if isinstance(plugins, list):
             plugins = PluginManager(plugins=plugins)
-        env = kw.pop('env', {})
-        kw['config'] = Config(env=env, plugins=plugins)
-    if 'argv' not in kw:
-        kw['argv'] = ['nosetests', '-v']
-    kw['config'].stream = buffer
+        env = kw.pop("env", {})
+        kw["config"] = Config(env=env, plugins=plugins)
+    if "argv" not in kw:
+        kw["argv"] = ["nosetests", "-v"]
+    kw["config"].stream = buffer
 
     # Set up buffering so that all output goes to our buffer,
     # or warn user if deprecated behavior is active. If this is not
@@ -386,17 +409,20 @@ def run(*arg, **kw):
     # disappear.
     stderr = sys.stderr
     stdout = sys.stdout
-    if kw.pop('buffer_all', False):
+    if kw.pop("buffer_all", False):
         sys.stdout = sys.stderr = buffer
         restore = True
     else:
         restore = False
-        warn("The behavior of nose.plugins.plugintest.run() will change in "
-             "the next release of nose. The current behavior does not "
-             "correctly account for output to stdout and stderr. To enable "
-             "correct behavior, use run_buffered() instead, or pass "
-             "the keyword argument buffer_all=True to run().",
-             DeprecationWarning, stacklevel=2)
+        warn(
+            "The behavior of nose.plugins.plugintest.run() will change in "
+            "the next release of nose. The current behavior does not "
+            "correctly account for output to stdout and stderr. To enable "
+            "correct behavior, use run_buffered() instead, or pass "
+            "the keyword argument buffer_all=True to run().",
+            DeprecationWarning,
+            stacklevel=2,
+        )
     try:
         run(*arg, **kw)
     finally:
@@ -404,13 +430,15 @@ def run(*arg, **kw):
             sys.stderr = stderr
             sys.stdout = stdout
     out = buffer.getvalue()
-    print munge_nose_output_for_doctest(out)
+    print(munge_nose_output_for_doctest(out))
 
 
 def run_buffered(*arg, **kw):
-    kw['buffer_all'] = True
+    kw["buffer_all"] = True
     run(*arg, **kw)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

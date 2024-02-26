@@ -4,6 +4,7 @@ necessary because test modules in different directories frequently have the
 same names, which means that the first loaded would mask the rest when using
 the builtin importer.
 """
+from __future__ import absolute_import
 import logging
 import os
 import sys

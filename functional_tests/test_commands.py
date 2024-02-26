@@ -3,7 +3,7 @@ import sys
 import unittest
 from nose.plugins.skip import SkipTest
 from nose import commands
-from StringIO import StringIO
+from io import StringIO
 
 support = os.path.join(
     os.path.dirname(__file__), 'support', 'issue191')

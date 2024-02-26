@@ -1,12 +1,14 @@
 """
 This module contains fixups for using nose under different versions of Python.
 """
+from __future__ import absolute_import
 import sys
 import os
 import traceback
 import types
 import inspect
 import nose.util
+import six
 
 __all__ = ['make_instancemethod', 'cmp_to_key', 'sort_list', 'ClassType',
            'TypeType', 'UNICODE_STRINGS', 'unbound_method', 'ismethod',
@@ -16,12 +18,12 @@ __all__ = ['make_instancemethod', 'cmp_to_key', 'sort_list', 'ClassType',
 # In Python 3.x, all strings are unicode (the call to 'unicode()' in the 2.x
 # source will be replaced with 'str()' when running 2to3, so this test will
 # then become true)
-UNICODE_STRINGS = (type(unicode()) == type(str()))
+UNICODE_STRINGS = (type(six.text_type()) == type(str()))
 
 if sys.version_info[:2] < (3, 0):
     def force_unicode(s, encoding='UTF-8'):
         try:
-            s = unicode(s)
+            s = six.text_type(s)
         except UnicodeDecodeError:
             s = str(s).decode(encoding, 'replace')
 
@@ -188,7 +190,7 @@ if sys.version_info[:2] < (3, 0):
                 clsname = force_unicode(ev.__class__.__name__,
                         encoding=encoding)
                 ev = u'%s: %s' % (clsname, msg)
-        elif not isinstance(ev, unicode):
+        elif not isinstance(ev, six.text_type):
             ev = repr(ev)
 
         return force_unicode(ev, encoding=encoding)

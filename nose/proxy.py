@@ -15,6 +15,7 @@ have a single stable interface for all test types, and also to
 manipulate the test object itself by setting the `test` attribute of
 the nose.case.Test that they receive.
 """
+from __future__ import absolute_import
 import logging
 from nose.config import Config
 
